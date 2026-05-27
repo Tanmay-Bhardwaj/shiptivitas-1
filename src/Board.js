@@ -1,7 +1,6 @@
 import React from 'react';
 import Dragula from 'dragula';
 import 'dragula/dist/dragula.css';
-import Swimlane from './Swimlane';
 import './Board.css';
 
 export default class Board extends React.Component {
@@ -14,13 +13,17 @@ export default class Board extends React.Component {
         inProgress: clients.filter(client => client.status && client.status === 'in-progress'),
         complete: clients.filter(client => client.status && client.status === 'complete'),
       }
-    }
+    };
+    
     this.swimlanes = {
       backlog: React.createRef(),
       inProgress: React.createRef(),
       complete: React.createRef(),
-    }
+    };
+    
+    this.drake = null;
   }
+  
   getClients() {
     return [
       ['1','Stark, White and Abbott','Cloned Optimal Architecture', 'in-progress'],
@@ -50,27 +53,72 @@ export default class Board extends React.Component {
       status: companyDetails[3],
     }));
   }
-  renderSwimlane(name, clients, ref) {
-    return (
-      <Swimlane name={name} clients={clients} dragulaRef={ref}/>
-    );
+  
+  renderCards(status) {
+    const bgColor = status === 'backlog' ? '#6c757d' : 
+                   status === 'in-progress' ? '#007bff' : '#28a745';
+    const textColor = status === 'in-progress' ? '#ffffff' : '#000000';
+    
+    const clients = this.state.clients[
+      status === 'backlog' ? 'backlog' : 
+      status === 'in-progress' ? 'inProgress' : 'complete'
+    ];
+    
+    return clients.map(c => (
+      <div
+        key={c.id}
+        className="Card"
+        data-id={c.id}
+        style={{ backgroundColor: bgColor, color: textColor, cursor: 'grab', userSelect: 'none' }}
+      >
+        <div><strong>{c.name}</strong></div>
+        <div>{c.description}</div>
+      </div>
+    ));
   }
-
+  
+  updateCardColor = (el, swimlaneId) => {
+    const colorMap = {
+      'backlog': '#6c757d',
+      'in-progress': '#007bff',
+      'complete': '#28a745'
+    };
+    const textMap = {
+      'backlog': '#000000',
+      'in-progress': '#ffffff',
+      'complete': '#000000'
+    };
+    
+    if (el && colorMap[swimlaneId]) {
+      el.style.backgroundColor = colorMap[swimlaneId];
+      el.style.color = textMap[swimlaneId];
+    }
+  };
+  
+  componentDidMount() {
+    this.drake = Dragula([
+      this.swimlanes.backlog.current,
+      this.swimlanes.inProgress.current,
+      this.swimlanes.complete.current,
+    ]);
+    
+    this.drake.on('drop', (el, target, source) => {
+      const swimlaneId = target.id;
+      this.updateCardColor(el, swimlaneId);
+    });
+  }
+  
   render() {
     return (
       <div className="Board">
-        <div className="container-fluid">
-          <div className="row">
-            <div className="col-md-4">
-              {this.renderSwimlane('Backlog', this.state.clients.backlog, this.swimlanes.backlog)}
-            </div>
-            <div className="col-md-4">
-              {this.renderSwimlane('In Progress', this.state.clients.inProgress, this.swimlanes.inProgress)}
-            </div>
-            <div className="col-md-4">
-              {this.renderSwimlane('Complete', this.state.clients.complete, this.swimlanes.complete)}
-            </div>
-          </div>
+        <div className="Swimlane-column" id="backlog" ref={this.swimlanes.backlog}>
+          {this.renderCards('backlog')}
+        </div>
+        <div className="Swimlane-column" id="in-progress" ref={this.swimlanes.inProgress}>
+          {this.renderCards('in-progress')}
+        </div>
+        <div className="Swimlane-column" id="complete" ref={this.swimlanes.complete}>
+          {this.renderCards('complete')}
         </div>
       </div>
     );

@@ -1,3 +1,63 @@
 .Board {
-  margin-top: 12px;
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  overflow-x: auto;
+}
+
+.Swimlane-column {
+  background-color: #f4f5f7;
+  border-radius: 4px;
+  padding: 12px;
+  min-width: 280px;
+  max-width: 280px;
+}
+
+.Card {
+  background-color: grey; /* default, will be overridden inline */
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 8px;
+  cursor: grab;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+
+.Card:active {
+  cursor: grabbing;
+}
+
+/* Dragula placeholder styling */
+.gu-mirror {
+  position: fixed !important;
+  margin: 0 !important;
+  z-index: 9999 !important;
+}
+
+.Board {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+}
+
+.Swimlane-column {
+  background-color: #f4f5f7;
+  border-radius: 4px;
+  padding: 12px;
+  min-width: 280px;
+  max-width: 280px;
+  min-height: 400px;
+}
+
+.Card {
+  background-color: grey;
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 8px;
+  cursor: grab;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  user-select: none;
+}
+
+.Card:active {
+  cursor: grabbing;
 }
